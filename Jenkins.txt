@@ -1,0 +1,77 @@
+Continous Integration- It is the Software Devlopment Process, Where the Developers Share the Code changes to the shared Repositories, which Automatically trigreer's the Build and Test stages of these code changes and Deploy to the target Envinorment.(where CD comes into part)
+   Benifits:  Faster Depolyement, Increase in quality and faster delvery of software, helps figure out issues and bugs faster.
+   prerequsite for CI is The project repositor along with build script.
+
+Jenkins:  Jenkins is a Open source platform, which is responsible for Continous integration, where it primarirly focus on the Building and testing stages.  and initates the CD process. 
+and It as platform indipendent, where it follows master-slave Architecture, where it automates code changes commited by the devloper,and build the artifacts. 
+Jenkins default port number "8080".
+
+Jenkins Installation: prerequsite for Jenkins is to installed the java jdk on the jenkins server. 
+    Jenkins Follow Master Slave Architecture, where the master Server responsible for Sheduling the builds on the Nodes, as well to dispatch the builds to the nodes. and Provides The UI for the jenkins server. And servering the dashboard for users to monitor and interact with jenkins.
+    > Where as the Nodes is responsible for executing the builds dispatched by the master slave.
+    >> supports Variety of platforms like lunix, windows, macos, and also cloud nodes like EC2 , kubernetes. docker as well.
+    >> Jenkins provide 1000 pulgins. 
+
+>>  the jenkins default path is /var/lib/jenkins >> it is the JENKINS_HOME directory.
+    >> And the default port number is 8080. and also we can edit the port number in the jenkins default configuration  "sudo nano /etc/default/jenkins" and edit the port number here and the restart the jenkins using either in server or UI. 
+    >> The commands to start and enable and restart the jenkins is sudo systemctl start jenkins, same enable jenkins , and status jenkins, ans restart jenkins. 
+    >> if we use http//:locat.host:8080/saferestart >> when we use to restart the builds which in the running will run and after completing the all build stages then the jenkins server gets restarts.
+
+>> How do you See the log in jenkins >> we will see in the system logs, where we can also create the own custom logs.
+>> we can we Jenkins form one machine to another machine.  >> By Creating the backup of jenkins Home directory, where it conatains all the information like builds, jobs, configuration, and build histroy. we create back up of this folder in the old jenkins server and install the jenkins in new server and before starting the jenkins we copy this main Jekins Home directory into the new server and verify all the files  and the start the jenkins server and then verify by runing the small scripts.
+    
+>> We will backup jenkins by  
+                           >>First stop the jenkins server and then. Find the jenkins Home Directory(sudo nano /etc/default/jenkins)>> this command opens the defalut config and conatins the information about the JEnkins Home directory. 
+                           >> and create the the new folder to backup the jenkins. and copy all the files from jenkins home to the folder that we created using 
+                           (sudo cp -r /var/lib/jenkins /path/to/backup_directory). 
+                           >> and then Using Tar command Achieve all files in the directoy.
+                           >> We can automate this by using CronJob 
+                           >> Write the script in the folder and then give the permission using chmod.
+                           >> using crontab  -e it will open the file, and add the cronjob event 
+                           (* * * * * /path/to/backup_jenkins.sh >> /path/to/backup_directory/backup.log 2>&1)
+>> parametrized build 
+           >>  it mean Passing different types of parameters to a job at runtime.
+           >> it helps to run the job with diffrent types of parameters. instead of creating multiple jobs.
+           >> parameters like bolean parameter, Choice parameter, File parameter, credentieal parameter.
+
+Different types of Pipelines 
+1. scripted pipeline - uses grovy scripting for writing the pipelines.
+2. declarative pipeline - uses declarative syntax, which is esay for understanding and writing.
+3. Jenkins File as  Pipeline - it is file which contains all the steps and events and prescent in the directory of the project in vcs.
+4. multibranch pipeline - it is used to initate the build for each branch in the project or vcs.
+5. pipeline template.
+
+Free Style Project - It is a straight forward thing which is used to carry out the small builds and tasks. through web interface.
+
+>> we can configure sevreal build and test servers versions in the  tool configuration, where it downloads from the central repository.
+>> Sonarqube - we configure sonarqube using the we fisrt deploy the sonar server and then we will generate the authentication token in the server and put in the jenkins credentials tab and save there we will configure the(note: install the sonar scanner plugin) and we can see system tab where we add the sonarqube server url.  
+
+** User Management in Jenkins.
+>>  by Default Jenkins has a own user data base. 
+     >> Where we can create the users and delete users.
+>> here the important thing is we have tho choose the authentication and as well as authorization under configure global security >> security releam.
+     >> And the Authentication Stratagey's We can  use diffrent types 
+     1. LDAP(light wieght directory access protocol)- Here It is a directory where it stores the users credentials. used for authentication and management.
+     2. Using GitHub  Credentieals.
+     3. Using OAuth Providers like Google, GitHub.
+     4. also Using Single sign-on via SAML( simpleAresstion Markup Language)
+>> For Authorization Stratagey we use.
+1. role based Authorization stratagey. used to define roles and assign them to users and adds them to the group. 
+2. project based matrix authorization stratagey. - used to give permisions to specific projects, or to some specfic folders.
+3. matrix based security : it provides fine grade acces by defining permissions to the users at a detailed way.
+
+>>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      
