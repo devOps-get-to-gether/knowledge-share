@@ -3,5 +3,5 @@
 >> Schedule the Cron Job. Edit the crontab to schedule the backup script. Open the crontab editor:
 >> * * * * * <path if required>/<followed by file Name>. 
 >> we can Verify Cron Job Execution. To verify that the cron job is set up correctly, you can check the cron job entries, using command " crontab -1 "
->>  we can see the Errors in the in the folder path were we are creating the crontab execution check " logs".
+>>  we can see the Errors in the in the folder path were we are creating the crontab execution check " logs".  
 
