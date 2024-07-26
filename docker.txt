@@ -1,0 +1,209 @@
+>> Docker- Docker is a platform which  implements Containerization of applications. 
+>> Docker Provides an easy way to containerize the applications. in which it provides an easy way to build images and run these images to create containers.
+and push the images which are built to the registry  which is docker Hub (or) Amazon ECR.
+
+
+what is Docker Containers:
+>> Containers are the Light Weight standalone Executable Unit that Packages an application and its dependencies so the application run more quickly and reliable from one computing environment to other.
+ and these docker images are used to create the containers.
+>>Containers Are Portable and can run on any Host Operating System. And Use the Host Operating System For the resource utilization.  and Are less secure  because they use Host Operating system.
+ And Containers are light in weight because they use the technology called containerization. And even they use the Host Operating system still provides isolation to the application and its Dependencies.
+ And Results in smaller Foot Prints When Compared to Virtual Machines.
+
+ what is Docker Images:
+ >> Docker  images are light weight standalone executable Package includes everything to run a peace of application (or) Software inculuding  system dependencies, System 
+libraries, System Calls.
+
+>> Docker:
+            Docker Follow Client Server Architecture. 
+            >> Where it contains 
+            1. Docker Client - Also Known as Docker API - Where it takes the Requests From the API and passes to the Docker Demon(Docker D).
+            2. Docker Host - it is the server where we install the docker.
+            3. Docker Demon- also Known as Docker D, where It takes the requests from the Docker Clients And build the images and run the images to create containers.
+                             and push the images to the container registry.
+            4. Docker Registry - Where it Stores the Images in the repository.
+
+>> Advantages Of Docker: Scalability, Flexibility, Portability, and Security by the isolating the applications from host system, and simplified deployment.
+
+>> Docker Image Creation 
+(For Creating the Container we Required the base image)
+For Creating Docker Image we Require Docker File in the root of the project repository.
+By default we can also create or run the default images like ngnix, or Ubuntu.
+
+Example of project Repository:
+
+my-node-app/
+├── Dockerfile - contains the Instructions to build the Docker i
+├── app.js    -  The main application file
+├── package.json      .json and lock.json Contains the project dependencies and metadata.
+└── package-lock.json
+
+We create an image for this Using Command    >> docker build -t my-node-app .   # it builds the image my-node-app in the current directory Using ('.')
+as build context
+
+we can run this image to create the container 
+   >> docker run -d --name my-running-app my-node-app
+  >>  for mapping to the port we use -p 
+     >> docker run -d -p 8080:8080 --name my-running-app my-node-app
+        # where it maps 8080 on the host to port 8080 on the container.
+
+>> for seeing all the images we use >> docker Images
+>> for seeing all the container we use >> docker  ps -a
+>> for stopping the running container we use >> docker stop <name of the container>
+>> for removing the image or container we use >> docker rm (container name) or(image name)
+>> How to login into the docker container >> using exec command    >> docker exec -it <container_name_or_id> /bin/bash    # /bin/bash: This is the command to run inside the container. 
+>> for example docker exec -it my-running-app ls /app  # this commands list all the files in the /app folder inside the container.
+>> To view the logs of a running container, you can use the docker logs command: >> docker logs my-running-app
+>> docker images prune >> this command deletes all the unused images, in the same way we can use it for unused containers.
+
+
+>> Container Limits: Allocation of CPU or Memory to the container is called Container Limits.
+>> Generally, we took t2.micro i.e. 1 CPU, 1GB ram. So, in overall server we have 1 CPU & 1 GB ram
+ So, right now for server inside created containers, I want to provide 0.25% CPU, 250 MB of ram. So, these 
+we called as limitations
+Note: we have to mention that limits when you're performing a command
+ docker run -itd --name cont1 -p 8084:80 --memory=250m --cpus="0.25" <Name of the container>
+ Now, check the limits whether it's applied/not. So, for that we have to do inspect the container
+ docker inspect cont1 | grep -i memory
+
+
+Docker file   >> # This is the DockerFile.
+[#Use an official Node.js runtime as a parent image(sets Base image for the Docker Image)
+FROM node:14
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json files
+COPY package*.json ./
+
+# Install the project dependencies  and used to execute the commands while we build the image.
+RUN npm install
+
+# Copy the rest of the application code to the docker image.
+COPY . .
+
+# Expose the application port so that 
+EXPOSE 8080
+
+# Define the defaults commands to run the application (or) Container
+CMD ["node", "app.js"]   ]
+
+ENTRYPOINT # it is used to ensure  that a specific Command to be executed when the Containers starts. and ensures that the Container is Executed in a set of specfic options
+
+>> we can tag the images that we created  it helps to Identify the Images Without any overridden.
+
+
+** Multi Stage Docker Build *** 
+>> Instead of having one build stage in the Docker File, We can setup multiple stages like each stage perform specific operation.
+>> So for each stage we will use base Image. so that we will have a light weight for each stage like separate image for building the application and separate image for running the Application.
+>> So it helps to reduce the image size in the final image. and making the build process more efficient.
+
+>> This is the Docker File Which Contains Multi stage Build.
+
+# Stage 1: Build the application
+FROM golang:1.17 AS builder
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Go application source code
+COPY main.go .
+
+# Compile the Go application
+RUN go build -o hello
+
+# Stage 2: Create the final image
+FROM alpine:latest
+
+# Set the working directory inside the container
+WORKDIR /root/
+
+# Copy the compiled binary from the builder stage
+COPY --from=builder /app/hello .
+
+# Command to run the application
+CMD ["./hello"]
+
+
+>> the Above File Contains the 2 stages in which it builds two images.
+
+**** Distroless Image *** 
+>> A Distroless image is Docker Image where it contains only the application and its runtime dependencies, which are required to run the application.
+Without including the Unwanted dependencies, and Unnecessary Host operating components.
+>> Distroless images are Designed to be as  minimal as possible where the security and Efficiency are the top Priorities.
+which contains only the bare essentials required to run the application.  so this Distroless images are typically used to Deploy the containers in the Production environment.
+
+*** Docker Bind Mounts ***
+>>  Bind Mounts Are used for storage, Where it is used to mount to the directory in host machine to the directory in the container.
+>>  Where When changes are made in the host directory automatically reflected in the Container directory (Vise Versa).
+>>  Bind Mounts offers more Flexibility and control over the data stored. where it is used for developments workflows.
+>>  Where it depends on the Host directory, when the  Container Goes down or the container is removed the Bind mounts gets automatically removed.
+>> 
+>> docker run /path/to/directory:path/to/directory <image name>
+
+
+*** Docker Volumes ***
+>> Volumes provide the way to persist the data even after the containers gets removed or stopped.
+>> volumes exist independently, and these volumes are maintained by docker. and even if the container is removed or stopped volumes does not gest deleted.
+>> Volumes are used in the production where these are used to provide data across multiple containers.
+>> Volumes can be used to transfer data across multiple containers. volumes can be easily attached to the container and can be easily detached.
+>> we can't create the volume from existing containers.
+>> We can map volume in two ways 
+a. container → container
+b. Host → container
+>> #to create the volume command = " docker volume create <name> "
+>> we also use a Docker volume in a container, you can specify the volume with the -v or --mount flag when running a container.
+>> "docker run -d --name <name of the container> -v <name of volume>:/path/in/container <name of image>"
+>> "docker run -d --name <name of container> --mount source=<name of volume>,target=/path/in/container <name of the image>
+>> to list all the docker volumes Command is "docker volume ls"
+>> We can also share the volume from one container to other container.
+> for example i have 2 containers cont1, and cont2 
+>> " docker run -it --name cont2 --privileged=true --volumes-from cont1 <name of image>
+>> "privileged=true" is nothing but we are sharing the data.
+>> if we want to attach the volume which we have created manually, so first we have to copy the data 
+>> " docker cp old-container:/path/in/container /path/on/host "  
+>> stop the old container, and remove the old container.
+>> And run the container with the volume   "docker run -d --name new-container -v my_volume:/path/in/container my_image"
+>>  and copy the data from host machine to new container "docker cp /path/on/host new-container:/path/in/container"
+>> verify the Volume " docker exec -it new-container ls /path/in/container" .
+
+
+*** Docker Networks ***
+>> Networking in docker: Network is used to establish communication between the containers and with the host system.
+>> by Default we get networking which is Bridge networking. which will have the default networking protocol, which is managed by docker d through virtual ethernet.
+
+1. Bridge Networking: it is the default Networking made in the containers. and it establishes a private network between the host and the container.
+>> it contains an Ip address.
+
+2. Host Networking:  This Networking mode allows the containers to share the host networking stack, and provide direct access to the host networking system.
+>> In this mode the Ip address of the container and the Ip address of the server will be the same, so that is the reason to call it as host networking system.
+>> It provides less Security because it provides direct access to the host networking resources.
+
+3. Overlay Networking: This Networking Mode allows to communication between the containers which are present in the different servers(or) Different Docker Host Machines.
+>> it Is useful when the containers are present in the different Docker Machines or Servers.
+
+4. MacValn Networking: this Networking mode allows the containers to appear on the network as a physical host rather than a container.
+
+
+*** we can create the Custom Networks ****
+>> command to create the custom network is =  docket network create <name>
+>> we can create the custom bridge networks, host networks, as well as overlay networks.  
+>>"docker network create -d bridge <name of network>" # it creates a  bridge network.
+>> "docker run -d --name <container name> --network <name of network where you created> <image name>  
+>> " docker network inspect <name of network>"
+>> Host Network
+To run a container using the host network: " docker run -d --name <name of container> --network host <image name>
+to inspect use " docker network inspect host "
+
+*** Docker Swarm ***
+>> It is a native clustering and Orchestration tool for docker containers.
+>> Where it creates(or)manages the cluster of docker hosts as a single virtual machine.
+>> simply it the group of servers that runs the docker applications.
+>> It is Nothing but it is used to manage multiple containers on the multiple servers.
+>> this was implemented by creating a cluster and taken care by Swarm Manager simply called as Manager Node and the servers which are going to be join in the cluster as called as swarm workers (worker nodes).
+>> Docker Swarm Provides Built-in mechanism for high availably and also security features like TLS And encryption. and also the Role Based access to the cluster.
+>> It allows you scale your application by adding or removing the nodes.
+
+
+
